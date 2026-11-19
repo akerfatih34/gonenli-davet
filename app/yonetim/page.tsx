@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { api, fmtTime, fmtCode, trSearch } from "@/lib/client";
+import { api, fmtTime, fmtCode, trSearch, logoUrl } from "@/lib/client";
 
 type Guest = { t: string; n: string; no?: string; d?: string; p?: string; k?: number; tl?: string; hasTc?: boolean; tc?: string };
 type Checkin = { at: number; g: string };
@@ -12,6 +12,7 @@ type Settings = {
   note: string;
   giftAtEntry: boolean;
   drawOnlyPresent: boolean;
+  logos?: { client?: number; venue?: number };
 };
 type Tab = "ozet" | "liste" | "davetiye" | "cekilis" | "ayar";
 
@@ -777,6 +778,15 @@ function Ayarlar({ initial, reload }: { initial: Settings; reload: () => void })
         </div>
       </div>
       <div className="card">
+        <h3>Logolar</h3>
+        <p className="muted" style={{ fontSize: 14 }}>
+          Firmanın web sitesinin adresini yapıştırıp "Getir"e basın, logo otomatik bulunur. Bulunamazsa logonun resim adresini yapıştırın ya da
+          dosya yükleyin. Logolar davetiyede, basılı kartta, afişte ve çekiliş ekranında görünür.
+        </p>
+        <LogoBox k="client" label="Davet eden firma (ana logo)" placeholder="https://www.gonenlisut.com" s={s} setS={setS} />
+        <LogoBox k="venue" label="Mekân logosu" placeholder="https://www.tokyaybahce.com" s={s} setS={setS} />
+      </div>
+      <div className="card">
         <h3>Deneme ve temizlik</h3>
         <p className="muted" style={{ fontSize: 14 }}>
           Etkinlikten önce birkaç davetiyeyle deneme yapın, sonra "Girişleri sıfırla" ile temizleyin. Etkinlik bittikten ve raporları
@@ -805,6 +815,68 @@ function Ayarlar({ initial, reload }: { initial: Settings; reload: () => void })
           >
             Her şeyi sil
           </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LogoBox({ k, label, placeholder, s, setS }: { k: "client" | "venue"; label: string; placeholder: string; s: Settings; setS: (s: Settings) => void }) {
+  const [src, setSrc] = useState("");
+  const [msg, setMsg] = useState("");
+  const [busy, setBusy] = useState(false);
+  async function send(body: any) {
+    setBusy(true);
+    setMsg("");
+    try {
+      const r = await api("/api/logo", { body: { k, ...body } });
+      setS({ ...s, logos: { ...(s.logos || {}), [k]: body.remove ? undefined : r.v } });
+      setMsg(body.remove ? "Kaldırıldı" : "✅ Logo kaydedildi");
+      setSrc("");
+    } catch (e: any) {
+      setMsg("❌ " + e.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+  const url = logoUrl(s, k);
+  return (
+    <div style={{ borderTop: "1px solid var(--line)", paddingTop: 12, marginTop: 12 }}>
+      <b>{label}</b>
+      <div className="row" style={{ marginTop: 8 }}>
+        <div style={{ width: 160, height: 70, border: "1px dashed var(--line)", borderRadius: 10, display: "grid", placeItems: "center", background: "#fff" }}>
+          {url ? <img src={url} alt="" style={{ maxWidth: 150, maxHeight: 60, objectFit: "contain" }} /> : <span className="muted" style={{ fontSize: 12 }}>Logo yok</span>}
+        </div>
+        <div className="grow" style={{ minWidth: 240 }}>
+          <div className="row">
+            <input className="input grow" placeholder={placeholder} value={src} onChange={(e) => setSrc(e.target.value)} />
+            <button className="btn" disabled={busy || !src.trim()} onClick={() => send({ src: /^https?:/i.test(src.trim()) ? src.trim() : "https://" + src.trim() })}>
+              {busy ? "…" : "Getir"}
+            </button>
+          </div>
+          <div className="row" style={{ marginTop: 8 }}>
+            <label className="btn sm ghost" style={{ cursor: "pointer" }}>
+              Dosya yükle
+              <input
+                type="file"
+                accept="image/*"
+                hidden
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (!f) return;
+                  const rd = new FileReader();
+                  rd.onload = () => send({ src: rd.result });
+                  rd.readAsDataURL(f);
+                }}
+              />
+            </label>
+            {url && (
+              <button className="btn sm ghost" disabled={busy} onClick={() => send({ remove: true })}>
+                Kaldır
+              </button>
+            )}
+            <span style={{ fontSize: 13 }}>{msg}</span>
+          </div>
         </div>
       </div>
     </div>

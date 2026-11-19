@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import QRCode from "qrcode";
-import { api, fmtCode } from "@/lib/client";
+import { api, fmtCode, logoUrl } from "@/lib/client";
 
 type Guest = { t: string; n: string; no?: string; d?: string; k?: number };
 
@@ -83,7 +83,11 @@ export default function Davetiyeler() {
             {list.slice(p * 8, p * 8 + 8).map((g) => (
               <div className="inv" key={g.t}>
                 <div className="l">
-                  <div className="brand">{s.title}</div>
+                  {logoUrl(s, "client") ? (
+                    <img src={logoUrl(s, "client")} alt="" style={{ height: "13mm", maxWidth: "45mm", objectFit: "contain", objectPosition: "left" }} />
+                  ) : (
+                    <div className="brand">{s.title}</div>
+                  )}
                   <div className="sub">{s.subtitle}</div>
                   <div className="dear">Sayın</div>
                   <div className="name">{g.n}</div>
@@ -91,6 +95,9 @@ export default function Davetiyeler() {
                     {s.date && <div>📅 {s.date}</div>}
                     {s.place && <div>📍 {s.place}</div>}
                     {s.note && <div className="note">{s.note}</div>}
+                    {logoUrl(s, "venue") && (
+                      <img src={logoUrl(s, "venue")} alt="" style={{ height: "5mm", maxWidth: "30mm", objectFit: "contain", marginTop: "1.5mm", display: "block" }} />
+                    )}
                   </div>
                 </div>
                 <div className="r">

@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { logoUrl } from "@/lib/client";
 
 export default function Home() {
   const [tc, setTc] = useState("");
@@ -30,7 +31,13 @@ export default function Home() {
     <main className="center">
       <div style={{ width: "100%", maxWidth: 420 }}>
         <div style={{ color: "#fff", textAlign: "center", marginBottom: 20 }}>
-          <div style={{ fontSize: 30, fontWeight: 900 }}>{s?.title || "Gönenli Süt"}</div>
+          {logoUrl(s, "client") ? (
+            <div style={{ background: "#fff", borderRadius: 18, padding: "12px 22px", display: "inline-block", marginBottom: 10 }}>
+              <img src={logoUrl(s, "client")} alt={s.title} style={{ height: 80, maxWidth: 240, objectFit: "contain", display: "block" }} />
+            </div>
+          ) : (
+            <div style={{ fontSize: 30, fontWeight: 900 }}>{s?.title || "Gönenli Süt"}</div>
+          )}
           <div style={{ color: "#f3d27a", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", fontSize: 14, marginTop: 4 }}>
             {s?.subtitle || "Personel Yemeği ve Eğlencesi"}
           </div>
@@ -38,6 +45,11 @@ export default function Home() {
             <div style={{ opacity: 0.85, marginTop: 10, fontSize: 15 }}>
               {s?.date && <div>📅 {s.date}</div>}
               {s?.place && <div>📍 {s.place}</div>}
+            </div>
+          )}
+          {logoUrl(s, "venue") && (
+            <div style={{ background: "#fff", borderRadius: 10, padding: "6px 12px", display: "inline-block", marginTop: 10 }}>
+              <img src={logoUrl(s, "venue")} alt="" style={{ height: 26, display: "block" }} />
             </div>
           )}
         </div>

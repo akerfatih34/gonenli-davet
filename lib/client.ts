@@ -31,3 +31,5 @@ export function tokenFromScan(text: string): string {
   const m = s.match(/\/d\/([0-9A-Za-z-]+)/);
   return (m ? m[1] : s).toUpperCase().replace(/[^0-9A-Z]/g, "");
 }
+
+export const logoUrl = (s: any, k: "client" | "venue") => (s?.logos?.[k] ? `/api/logo?k=${k}&v=${s.logos[k]}` : "");

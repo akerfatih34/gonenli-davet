@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api } from "@/lib/client";
+import { api, logoUrl } from "@/lib/client";
 
 type Prize = { id: string; name: string; qty: number; left: number };
 type Winner = { id: string; prizeId: string; prizeName: string; t: string; n: string; no?: string; d?: string; at: number; status: "won" | "absent" };
@@ -110,7 +110,13 @@ export default function Cekilis() {
     >
       <canvas ref={canvasRef} style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 30, width: "100%", height: "100%" }} />
       <section style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 40, textAlign: "center" }}>
-        <div style={{ fontSize: 22, letterSpacing: 6, color: "#f3d27a", fontWeight: 800 }}>{data?.settings?.title?.toLocaleUpperCase("tr-TR")}</div>
+        {logoUrl(data?.settings, "client") ? (
+          <div style={{ background: "#fff", borderRadius: 20, padding: "12px 26px", marginBottom: 8 }}>
+            <img src={logoUrl(data?.settings, "client")} alt="" style={{ height: 90, maxWidth: 300, objectFit: "contain", display: "block" }} />
+          </div>
+        ) : (
+          <div style={{ fontSize: 22, letterSpacing: 6, color: "#f3d27a", fontWeight: 800 }}>{data?.settings?.title?.toLocaleUpperCase("tr-TR")}</div>
+        )}
         <div style={{ fontSize: 54, fontWeight: 900, marginTop: 6, textShadow: "0 4px 30px #0008" }}>🎁 HEDİYE ÇEKİLİŞİ</div>
 
         {!data && !err && <div style={{ marginTop: 40 }}>Yükleniyor…</div>}
@@ -207,6 +213,11 @@ export default function Cekilis() {
             <div style={{ fontSize: 13, color: "#f3d27a" }}>{w.prizeName}</div>
           </div>
         ))}
+        {logoUrl(data?.settings, "venue") && (
+          <div style={{ marginTop: 24, background: "#fff", borderRadius: 10, padding: "8px 12px", display: "inline-block" }}>
+            <img src={logoUrl(data?.settings, "venue")} alt="" style={{ height: 28, display: "block" }} />
+          </div>
+        )}
         <div style={{ marginTop: 20, fontSize: 12, opacity: 0.5 }}>
           <a href="/yonetim#cekilis" style={{ color: "#fff" }}>
             Yönetim paneli

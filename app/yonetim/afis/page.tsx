@@ -25,7 +25,13 @@ export default function Afis() {
       </div>
       <div className="poster">
         <div className="top">
-          <div style={{ fontSize: "34pt", fontWeight: 900 }}>{s?.title}</div>
+          {s?.logos?.client ? (
+            <div style={{ background: "#fff", borderRadius: "5mm", padding: "4mm 8mm", display: "inline-block", marginBottom: "3mm" }}>
+              <img src={`/api/logo?k=client&v=${s.logos.client}`} alt="" style={{ height: "30mm", maxWidth: "90mm", objectFit: "contain", display: "block" }} />
+            </div>
+          ) : (
+            <div style={{ fontSize: "34pt", fontWeight: 900 }}>{s?.title}</div>
+          )}
           <div style={{ fontSize: "15pt", color: "#f3d27a", fontWeight: 800, letterSpacing: 2, textTransform: "uppercase", marginTop: 3 }}>{s?.subtitle}</div>
           <div style={{ fontSize: "14pt", marginTop: 10 }}>
             {s?.date && <span>📅 {s.date}</span>} {s?.place && <span style={{ marginLeft: 14 }}>📍 {s.place}</span>}
@@ -44,6 +50,11 @@ export default function Afis() {
             ))}
           </div>
         </div>
+        {s?.logos?.venue && (
+          <div style={{ textAlign: "center", paddingBottom: "6mm" }}>
+            <img src={`/api/logo?k=venue&v=${s.logos.venue}`} alt="" style={{ height: "12mm", objectFit: "contain" }} />
+          </div>
+        )}
         <div style={{ background: "#c99a2e", color: "#fff", textAlign: "center", padding: "6mm", fontSize: "13pt", fontWeight: 700 }}>
           Telefonu olmayan arkadaşlarımızın davetiyesi İnsan Kaynakları'ndan basılı olarak verilecektir.
         </div>

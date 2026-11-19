@@ -112,6 +112,7 @@ export const K = {
   prizes: "gs:prizes",
   winners: "gs:winners",
   tc: "gs:tc",
+  logo: (k: string) => "gs:logo:" + k,
 };
 
 export type Guest = {
@@ -145,6 +146,7 @@ export type Settings = {
   note: string;
   giftAtEntry: boolean;
   drawOnlyPresent: boolean;
+  logos: { client?: number; venue?: number };
 };
 
 export const defaultSettings: Settings = {
@@ -155,6 +157,7 @@ export const defaultSettings: Settings = {
   note: "Girişte bu davetiyeyi görevliye okutunuz.",
   giftAtEntry: true,
   drawOnlyPresent: true,
+  logos: {},
 };
 
 export async function getSettings(): Promise<Settings> {

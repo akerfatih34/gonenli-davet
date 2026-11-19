@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import QRCode from "qrcode";
 import { renderInvite } from "@/lib/invite-image";
+import { logoUrl } from "@/lib/client";
 
 export default function Davetiye() {
   const { token } = useParams<{ token: string }>();
@@ -23,7 +24,7 @@ export default function Davetiye() {
           width: 700,
           color: { dark: "#0e3a63" },
         });
-        const blob = await renderInvite(d.guest, d.settings, qr);
+        const blob = await renderInvite(d.guest, d.settings, qr, { client: logoUrl(d.settings, "client"), venue: logoUrl(d.settings, "venue") });
         setImg({ url: URL.createObjectURL(blob), blob });
       })
       .catch((e) => setErr(e.message || "Davetiye bulunamadı"));

@@ -1,7 +1,25 @@
 "use client";
 // Davetiyeyi telefona kaydedilecek PNG resme çizer (1080 x 1620)
-export async function renderInvite(g: { n: string; t: string; k?: number }, s: any, qrDataUrl: string): Promise<Blob> {
-  const W = 1080, H = 1620;
+async function loadImg(src?: string): Promise<HTMLImageElement | null> {
+  if (!src) return null;
+  try {
+    const i = new Image();
+    i.src = src;
+    await i.decode();
+    return i;
+  } catch {
+    return null;
+  }
+}
+
+export async function renderInvite(
+  g: { n: string; t: string; k?: number },
+  s: any,
+  qrDataUrl: string,
+  logos: { client?: string; venue?: string } = {}
+): Promise<Blob> {
+  const [clientLogo, venueLogo] = await Promise.all([loadImg(logos.client), loadImg(logos.venue)]);
+  const W = 1080, H = venueLogo ? 1720 : 1620;
   const c = document.createElement("canvas");
   c.width = W;
   c.height = H;
@@ -20,6 +38,12 @@ export async function renderInvite(g: { n: string; t: string; k?: number }, s: a
     x.fillText(text, W / 2, y);
   };
 
+  // resmi oranını bozmadan (cx, cy) merkezine sığdır
+  const fit = (im: HTMLImageElement, cx: number, cy: number, mw: number, mh: number) => {
+    const r = Math.min(mw / im.naturalWidth, mh / im.naturalHeight);
+    const w = im.naturalWidth * r, h = im.naturalHeight * r;
+    x.drawImage(im, cx - w / 2, cy - h / 2, w, h);
+  };
   x.fillStyle = "#ffffff";
   x.fillRect(0, 0, W, H);
   const grad = x.createLinearGradient(0, 0, W, 360);
@@ -27,8 +51,18 @@ export async function renderInvite(g: { n: string; t: string; k?: number }, s: a
   grad.addColorStop(1, "#2f7cc1");
   x.fillStyle = grad;
   x.fillRect(0, 0, W, 330);
-  center(s.title || "", 150, font(900, 78), "#ffffff");
-  center((s.subtitle || "").toLocaleUpperCase("tr-TR"), 230, font(700, 38), "#f3d27a");
+  if (clientLogo) {
+    // beyaz kart içinde müşteri logosu
+    x.fillStyle = "#ffffff";
+    x.beginPath();
+    x.roundRect((W - 560) / 2, 28, 560, 210, 28);
+    x.fill();
+    fit(clientLogo, W / 2, 133, 500, 170);
+    center((s.subtitle || "").toLocaleUpperCase("tr-TR"), 295, font(700, 38), "#f3d27a");
+  } else {
+    center(s.title || "", 150, font(900, 78), "#ffffff");
+    center((s.subtitle || "").toLocaleUpperCase("tr-TR"), 230, font(700, 38), "#f3d27a");
+  }
 
   center("Sayın", 420, font(500, 36), "#6b7785");
   center(g.n, 500, font(800, 70), "#15202b");
@@ -61,6 +95,7 @@ export async function renderInvite(g: { n: string; t: string; k?: number }, s: a
     center("📍 " + s.place, iy, font(600, 38), "#15202b");
     iy += 60;
   }
+  if (venueLogo) fit(venueLogo, W / 2, iy + 30, 420, 90);
   x.fillStyle = "#c99a2e";
   x.fillRect(0, H - 110, W, 110);
   center(s.note || "Girişte bu davetiyeyi görevliye okutunuz.", H - 45, font(700, 32), "#ffffff");

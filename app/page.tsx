@@ -63,7 +63,7 @@ export default function Home() {
             inputMode="numeric"
             autoComplete="off"
             maxLength={11}
-            placeholder="TC Kimlik No (11 hane)"
+            placeholder="TC Kimlik No"
             style={{ fontSize: 24, textAlign: "center", padding: 16, letterSpacing: 3 }}
             value={tc}
             onChange={(e) => setTc(e.target.value.replace(/\D/g, "").slice(0, 11))}

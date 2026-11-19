@@ -19,15 +19,28 @@ interface Store {
 const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
 const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
 
+const asText = (v: unknown): string => (typeof v === "string" ? v : JSON.stringify(v));
+
 function redisStore(): Store {
   const r = new Redis({ url, token, automaticDeserialization: false });
   return {
     kind: "redis",
     async hgetall(key) {
-      return ((await r.hgetall(key)) as Hash) || {};
+      const raw: any = await r.hgetall(key);
+      if (!raw) return {};
+      // Ham yanıt [alan, değer, alan, değer, ...] dizisi olarak gelir
+      if (Array.isArray(raw)) {
+        const out: Hash = {};
+        for (let i = 0; i + 1 < raw.length; i += 2) out[String(raw[i])] = asText(raw[i + 1]);
+        return out;
+      }
+      const out: Hash = {};
+      for (const [k, v] of Object.entries(raw)) out[k] = asText(v);
+      return out;
     },
     async hget(key, field) {
-      return ((await r.hget(key, field)) as string) ?? null;
+      const v = await r.hget(key, field);
+      return v == null ? null : asText(v);
     },
     async hset(key, values) {
       const entries = Object.entries(values);
@@ -42,7 +55,8 @@ function redisStore(): Store {
       if (fields.length) await r.hdel(key, ...fields);
     },
     async get(key) {
-      return ((await r.get(key)) as string) ?? null;
+      const v = await r.get(key);
+      return v == null ? null : asText(v);
     },
     async set(key, value) {
       await r.set(key, value);

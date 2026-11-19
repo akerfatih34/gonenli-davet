@@ -23,6 +23,8 @@
    - `TC_SALT`: uzun, rastgele bir metin. **Liste yüklendikten sonra değiştirmeyin**, yoksa TC ile arama çalışmaz.
 5. **Deployments → Redeploy** ile yeniden yayınlayın. Yönetim panelindeki sarı uyarılar kaybolduysa kurulum tamamdır.
 
+> Sistemi başka birine devretmek veya taşımak için: [DEVIR.md](DEVIR.md). Yönetim → Ayarlar → **Yedek al / Yedekten yükle** ile bütün veri taşınabilir.
+
 ## Etkinlik öncesi yapılacaklar
 
 1. Gönenli Süt'ten **TC kimlik numaralı** personel listesini isteyin (Yönetim → Davetliler → "Boş Excel şablonunu indir"). Yönetim → Davetliler'den yükleyin.

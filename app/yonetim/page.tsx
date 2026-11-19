@@ -787,6 +787,49 @@ function Ayarlar({ initial, reload }: { initial: Settings; reload: () => void })
         <LogoBox k="venue" label="Mekân logosu" placeholder="https://www.tokyaybahce.com" s={s} setS={setS} />
       </div>
       <div className="card">
+        <h3>Yedekleme ve taşıma</h3>
+        <p className="muted" style={{ fontSize: 14 }}>
+          Tüm veriyi (davetli listesi, ayarlar, logolar, hediyeler, girişler) tek dosya olarak indirin. Bu dosyayla sistemi başka bir kuruluma
+          taşıyabilir ya da geri dönebilirsiniz. Dosyada kişisel veri var, güvenli saklayın.
+        </p>
+        <div className="row">
+          <a className="btn" href="/api/backup">
+            ⬇ Yedek al
+          </a>
+          <label className="btn ghost" style={{ cursor: "pointer" }}>
+            ⬆ Yedekten yükle
+            <input
+              type="file"
+              accept=".json,application/json"
+              hidden
+              onChange={async (e) => {
+                const f = e.target.files?.[0];
+                e.target.value = "";
+                if (!f) return;
+                let data: any;
+                try {
+                  data = JSON.parse(await f.text());
+                } catch {
+                  return alert("Dosya okunamadı.");
+                }
+                if (!confirm(`Bu sistemdeki tüm veri, ${f.name} yedeğindeki veriyle DEĞİŞTİRİLECEK. Devam?`)) return;
+                const withCheckins = confirm("Yedekteki girişler ve çekiliş sonuçları da yüklensin mi?\n(Tamam = evet, İptal = sadece liste ve ayarlar)");
+                try {
+                  const r = await api("/api/backup", { body: { data, withCheckins } });
+                  alert(
+                    `Yüklendi: ${r.guests} kişi.` +
+                      (r.tcKept ? "" : "\n\nUYARI: Bu kurulumun TC_SALT ayarı farklı olduğu için TC ile davetiye alma çalışmayacak. Ya TC_SALT'ı eski kurulumla aynı yapın ve yedeği tekrar yükleyin, ya da TC'li listeyi yeniden yükleyin.")
+                  );
+                  location.reload();
+                } catch (err: any) {
+                  alert(err.message);
+                }
+              }}
+            />
+          </label>
+        </div>
+      </div>
+      <div className="card">
         <h3>Deneme ve temizlik</h3>
         <p className="muted" style={{ fontSize: 14 }}>
           Etkinlikten önce birkaç davetiyeyle deneme yapın, sonra "Girişleri sıfırla" ile temizleyin. Etkinlik bittikten ve raporları
